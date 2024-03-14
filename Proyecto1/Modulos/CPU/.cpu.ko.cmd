@@ -1,0 +1,1 @@
+cmd_/home/bragiova/Modules/Proyecto_1/CPU/cpu.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000 -z noexecstack   --build-id  -T ./scripts/module-common.lds -o /home/bragiova/Modules/Proyecto_1/CPU/cpu.ko /home/bragiova/Modules/Proyecto_1/CPU/cpu.o /home/bragiova/Modules/Proyecto_1/CPU/cpu.mod.o;  true
