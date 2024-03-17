@@ -3,11 +3,34 @@ services:
   base:
     image: "mysql"
     container_name: 'MYSQL_Base'
+    env_file: ./.env
     environment:
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
     volumes:
       - base_mysql:/var/lib/mysql      
     ports:
       - "3306:3306"
+  
+  backend_p1:
+    build: ./Backend
+    container_name: backend_p1
+    privileged: true
+    pid: host
+    restart: always
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+    ports:
+      - '3000:3000'
+    depends_on:
+      - base
+    env_file: ./Backend/.env
+    environment:
+      DB_HOST: base
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
 volumes:
   base_mysql:
