@@ -1,6 +1,6 @@
 # Proyecto 1
 
-## Backend Base de Datos
+## Base de Datos
 Se creó la base de datos en MySql con el siguiente script:
 
 ![script](./imagenes/bd1.png)
@@ -45,11 +45,11 @@ Se realiza la conexión a la BD
 
 ![gobd1](./imagenes/gobd1.png)
 
-Para insertar la información en la BD, se ejecuta el comando desde acá
+Para insertar la información en la BD, se ejecuta el comando
 
 ![gobd2](./imagenes/gobd2.png)
 
-Para obtener le histórico, se realiza un select a las tablas
+Para obtener el histórico, se realiza un select a las tablas
 
 ![gobd3](./imagenes/gobd3.png)
 
