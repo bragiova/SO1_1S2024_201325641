@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -21,8 +23,8 @@ import (
 var conexion = ConexionMysql()
 
 type DataUsage struct {
-	Ram float32 `json:"ram_porcentaje"`
-	Cpu float32 `json:"cpu_porcentaje"`
+	Ram float64 `json:"ram_porcentaje"`
+	Cpu float64 `json:"cpu_porcentaje"`
 }
 
 type Childs struct {
@@ -51,12 +53,12 @@ type CpuModel struct {
 }
 
 type RamModel struct {
-	Libre float32 `json: "libre"`
-	Uso   float32 `json "uso"`
+	Libre float64 `json: "libre"`
+	Uso   float64 `json "uso"`
 }
 
 type CpuRamHistorical struct {
-	Percentage float32 `json: "percentage"`
+	Percentage float64 `json: "percentage"`
 	Date       string  `json "date"`
 }
 
@@ -83,12 +85,13 @@ func home(response http.ResponseWriter, request *http.Request) {
 func cpuRamRealTime(response http.ResponseWriter, request *http.Request) {
 	response.Header().Add("content-type", "application/json")
 
-	var objCpu CpuModel = readCpuInfo()
-	var ramInfo = readRamInfo()
+	// var objCpu CpuModel = readCpuInfo()
+	var ramInfo float64 = readRamInfo()
+	var cpuInfo float64 = readCpuPercentage()
 
 	var dataReal DataUsage
 
-	dataReal.Cpu = objCpu.Cpu
+	dataReal.Cpu = cpuInfo
 	dataReal.Ram = ramInfo
 
 	json.NewEncoder(response).Encode(dataReal)
@@ -103,9 +106,9 @@ func cpuRamRoutineDB() {
 	for {
 		select {
 		case <-ticker.C:
-			var objCpu CpuModel = readCpuInfo()
-			if objCpu.Cpu > 0 {
-				saveDBCpuRamInfo(objCpu.Cpu, true)
+			var objCpu float64 = readCpuPercentage()
+			if objCpu >= 0 {
+				saveDBCpuRamInfo(objCpu, true)
 			}
 
 			var ramInfo = readRamInfo()
@@ -141,7 +144,7 @@ func readCpuInfo() CpuModel {
 	return cpu_obj
 }
 
-func saveDBCpuRamInfo(percentage float32, isCpu bool) {
+func saveDBCpuRamInfo(percentage float64, isCpu bool) {
 	var timeNow = time.Now().Format("2006-01-02 15:04:05")
 
 	tableName := (map[bool]string{true: "cpu_info", false: "ram_info"})[isCpu]
@@ -155,7 +158,7 @@ func saveDBCpuRamInfo(percentage float32, isCpu bool) {
 	fmt.Println(result)
 }
 
-func readRamInfo() float32 {
+func readRamInfo() float64 {
 	fmt.Println("DATOS OBTENIDOS DESDE EL MODULO RAM:")
 	fmt.Println("")
 	var ram_obj RamModel
@@ -248,4 +251,38 @@ func getCpuHistorical(response http.ResponseWriter, request *http.Request) {
 		lista = append(lista, logc)
 	}
 	json.NewEncoder(response).Encode(lista)
+}
+
+func readCpuPercentage() float64 {
+	fmt.Println("DATOS OBTENIDOS DESDE MPSTAT:")
+	fmt.Println("")
+
+	// cmd := exec.Command("sh", "-c", "mpstat")
+	cmd := exec.Command("mpstat", "1", "1")
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error al ejecutar el comando:", err)
+		fmt.Println("Mensaje de error:", stderr.String())
+		return 0
+	}
+
+	output := stdout.String()
+	lines := strings.Split(output, "\n")
+	// La línea que contiene el porcentaje de CPU es la penúltima
+	cpuLine := lines[len(lines)-2]
+	fields := strings.Fields(cpuLine)
+	cpuUsage, err := strconv.ParseFloat(fields[len(fields)-1], 64)
+
+	if err != nil {
+		fmt.Println("Error al convertir el porcentaje de CPU a float64:", err)
+		return 0
+	}
+
+	cpuPercentage := 100 - cpuUsage
+
+	return cpuPercentage
 }

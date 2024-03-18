@@ -10,9 +10,12 @@ services:
       - base_mysql:/var/lib/mysql      
     ports:
       - "3306:3306"
+    networks:
+      - network_p1
   
   backend_p1:
-    build: ./Backend
+    # build: ./Backend
+    image: "bragiova/backend_p1so1"
     container_name: backend_p1
     privileged: true
     pid: host
@@ -32,5 +35,20 @@ services:
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASSWORD
       DB_NAME: $DB_NAME
+    networks:
+      - network_p1
+
+  frontend_p1:
+    # build: ./frontend
+    image: "bragiova/frontend_p1so1"
+    container_name: frontend_p1
+    ports:
+      - '80:80'
+    networks:
+      - network_p1
+
 volumes:
   base_mysql:
+
+networks:
+  network_p1:

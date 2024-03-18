@@ -1,6 +1,9 @@
 # Imagen base
 FROM golang:latest
 
+# Install mpstat
+RUN apt-get update && apt-get install -y sysstat
+
 # Directorio de trabajo dentro del contenedor
 WORKDIR /api
 
