@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: so1p2
+  name: service-consumer
+spec:
+  ports:
+    - name: consumer-port
+      port: 3002
+      targetPort: 3002
+  selector:
+    name: consumer-deploy
+  type: NodePort

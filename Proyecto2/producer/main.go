@@ -80,5 +80,5 @@ func sendKafka(info Data) {
 }
 
 func main() {
-	http.HandleFunc("sendProducer", getData)
+	http.HandleFunc("/sendProducer", getData)
 }

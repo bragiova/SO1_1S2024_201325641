@@ -27,10 +27,10 @@ spec:
           - name: PORT
             valueFrom:
               secretKeyRef:
-                name: secret-grṕc-server
+                name: secret-grpc-server
                 key: PORT
           - name: PRODURL
             valueFrom:
               secretKeyRef:
-                name: secret-grṕc-server
+                name: secret-grpc-server
                 key: PRODURL
