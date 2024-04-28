@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer-deploy
+  namespace: so1p2
+spec:
+  selector:
+    matchLabels:
+      name: producer-deploy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: producer-deploy
+    spec:
+      containers:
+        - name: producer
+          image: bragiova/producer
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-producer
+                  key: PORT
+            - name: KAFKABROKER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-producer
+                  key: KAFKABROKER
+      imagePullSecrets:
+        - name: dockerhubpull

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpcClient-deploy
+  namespace: so1p2
+spec:
+  selector:
+    matchLabels:
+      name: grpcClient-deploy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: grpcClient-deploy
+    spec:
+      containers:
+        - name: grpcclient
+          image: bragiova/grpcclient
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-grpcclient
+                  key: PORT
+            - name: SERVERPORT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-grpcclient
+                  key: SERVERPORT
+            - name: HOST
+              valueFrom:
+                secretKeyRef:
+                  name: secret-grpcclient
+                  key: HOST

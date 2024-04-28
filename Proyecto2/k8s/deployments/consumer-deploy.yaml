@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-deploy
+  namespace: so1p2
+spec:
+  selector:
+    matchLabels:
+      name: consumer-deploy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: consumer-deploy
+    spec:
+      containers:
+        - name: consumer
+          image: bragiova/consumer
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: PORT
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: KAFKA_BROKERS
+            - name: KAFKA_TOPIC
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: KAFKA_TOPIC
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: REDIS_PASSWORD
