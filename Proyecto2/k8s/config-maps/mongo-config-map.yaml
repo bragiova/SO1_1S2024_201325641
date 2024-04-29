@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-configmap
+  namespace: so1p2
+data:
+  MONGODB_URI: "mongodb://mongodb:27017"

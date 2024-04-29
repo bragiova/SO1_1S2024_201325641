@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-configmap
+  namespace: so1p2
+data:
+  redis-config: |
+    dir /data
+    requirepass YOUR_PASSWORD

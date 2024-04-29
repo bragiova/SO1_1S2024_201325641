@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: consumer
-          image: bragiova/consumer
+          image: bragiova/consumer:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 3002
@@ -25,23 +25,23 @@ spec:
                 secretKeyRef:
                   name: secret-consumer
                   key: PORT
-            - name: KAFKA_BROKERS
+            - name: KAFKABROKER
               valueFrom:
                 secretKeyRef:
                   name: secret-consumer
-                  key: KAFKA_BROKERS
-            - name: KAFKA_TOPIC
+                  key: KAFKABROKER
+            - name: TOPIC
               valueFrom:
                 secretKeyRef:
                   name: secret-consumer
-                  key: KAFKA_TOPIC
+                  key: TOPIC
             - name: REDIS_HOST
               valueFrom:
                 secretKeyRef:
                   name: secret-consumer
                   key: REDIS_HOST
-            - name: REDIS_PASSWORD
+            - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:
                   name: secret-consumer
-                  key: REDIS_PASSWORD
+                  key: REDIS_PASS

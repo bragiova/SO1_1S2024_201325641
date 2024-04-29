@@ -15,12 +15,12 @@ spec:
 
     spec:
       containers:
-      - name: grpc-client
-        image: bragiova/client_grpc
+      - name: client-grpc
+        image: bragiova/client-grpc
         ports:
         - containerPort: 3000
-      - name: grpc-server
-        image: bragiova/server_grpc
+      - name: server-grpc
+        image: bragiova/server-grpc
         ports:
         - containerPort: 3001
         env:
