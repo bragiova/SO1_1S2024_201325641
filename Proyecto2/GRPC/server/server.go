@@ -13,6 +13,7 @@ import (
 	pb "server/proto"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
@@ -44,11 +45,18 @@ func (s *server) ReturnInfo(ctx context.Context, in *pb.RequestId) (*pb.ReplyInf
 		Rank:  in.GetRank(),
 	}
 	fmt.Println(data)
+	sendDataProducer(data)
 
 	return &pb.ReplyInfo{Info: "Se recibió la información"}, nil
 }
 
 func sendDataProducer(json_data Data) {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	data, err := json.Marshal(json_data)
 	if err != nil {
 		log.Fatalln(err)

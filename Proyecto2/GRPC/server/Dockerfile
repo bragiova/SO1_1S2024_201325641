@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Compilar la aplicación
-RUN go build -o server.go .
+RUN go build server.go
 
 # Exponer el puerto por el que la aplicación será accesible
 EXPOSE 3001
