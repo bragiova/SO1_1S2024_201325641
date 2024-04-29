@@ -24,6 +24,7 @@ func getData(w http.ResponseWriter, r *http.Request) {
 	var serverData Data
 	err := json.NewDecoder(r.Body).Decode(&serverData)
 	if err != nil {
+		log.Fatal("Error decode grpc")
 		http.Error(w, "Fallo decode json server grpc", http.StatusBadRequest)
 		return
 	}
@@ -37,7 +38,7 @@ func sendKafka(info Data) {
 		log.Fatal("Error loading .env file")
 	}
 
-	topic := os.Getenv("OPIC")
+	topic := os.Getenv("TOPIC")
 	kafkaBroker := os.Getenv("KAFKABROKER")
 
 	// Configura el productor
@@ -50,35 +51,40 @@ func sendKafka(info Data) {
 
 	defer producer.Close()
 
-	// Manejar señales de interrupción
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	jsonSended := fmt.Sprintf(`{"name":"%s","album":"%s","year":"%s","rank":"%s"}`, info.Name, info.Album, info.Year, info.Rank)
 
-	// Loop para enviar mensajes
-	run := true
-	for run == true {
-		select {
-		case sig := <-sigchan:
-			log.Printf("Terminando: %v\n", sig)
-			run = false
-		default:
-			jsonSended := fmt.Sprintf(`{"name":"%s","album":"%s","year":"%s","rank":"%s"}`, info.Name, info.Album, info.Year, info.Rank)
+	// Enviar mensaje
+	err = producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          []byte(jsonSended),
+	}, nil)
 
-			// Enviar mensaje
-			err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          []byte(jsonSended),
-			}, nil)
-
-			if err != nil {
-				log.Printf("Error al enviar mensaje a Kafka: %v\n", err)
-			} else {
-				log.Println("Mensaje enviado correctamente a Kafka")
-			}
-		}
+	if err != nil {
+		log.Printf("Error al enviar mensaje a Kafka: %v\n", err)
+	} else {
+		log.Println("Mensaje enviado correctamente a Kafka")
 	}
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+
 	http.HandleFunc("/sendProducer", getData)
+	log.Printf("Escuchando en el puerto %s", port)
+
+	go func() {
+		log.Fatal(http.ListenAndServe(":"+port, nil))
+	}()
+
+	// Manejar señales de interrupción
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigchan
+
+	log.Println("Señal de interrupción")
 }
