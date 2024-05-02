@@ -18,7 +18,7 @@ class readFile():
     def loadFile(self):
         print("Cargando ...")
         try:
-            with open("data.json", 'r', encoding='utf-8') as file:
+            with open("data-fin.json", 'r', encoding='utf-8') as file:
                 self.data = json.loads(file.read())
         except Exception:
             print(f'Error : {Exception}')

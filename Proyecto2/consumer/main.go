@@ -54,9 +54,8 @@ func saveRankeds(vote Vote, rdb *redis.Client) {
 		return
 	}
 
-	// context, hash, field, value
-	// Guarda el álbum con su rank
-	err = rdb.HSet(context.Background(), "Album", vote.Album, rank).Err()
+	// Incrementa la cantidad de votos por Album
+	err = rdb.HIncrBy(context.Background(), "Album", vote.Album, 1).Err()
 	if err != nil {
 		fmt.Printf("Error al enviar datos Album Redis: %v\n", err)
 		return
@@ -80,15 +79,30 @@ func calcAverageAlbum(rdb *redis.Client) {
 		return
 	}
 
+	// Obtener todos los valores almacenados con el hash "Rank"
+	rankCount, err := rdb.HGetAll(context.Background(), "Rank").Result()
+	if err != nil {
+		fmt.Printf("Error al obtener los valores de Redis: %v\n", err)
+		return
+	}
+
 	// Calcular el promedio para cada álbum
-	for album, rank := range albumCount {
-		rank64, err := strconv.ParseFloat(rank, 64)
+	for album, counter := range albumCount {
+		counter64, err := strconv.ParseFloat(counter, 64)
 		if err != nil {
 			fmt.Printf("Error al convertir el valor a float64: %v\n", err)
 			continue
 		}
+
+		// Se busca el valor en el map de Ranks, para obtener la sumatoria de ranks por el album
+		rank64, err := strconv.ParseFloat(rankCount[album], 64)
+		if err != nil {
+			fmt.Printf("Error al convertir el valor a float64: %v\n", err)
+			continue
+		}
+
 		// Promedio
-		average := rank64 / float64(len(albumCount))
+		average := rank64 / counter64
 
 		// Guardar el promedio de cada álbum
 		err = rdb.HSet(context.Background(), "Average", album, average).Err()
