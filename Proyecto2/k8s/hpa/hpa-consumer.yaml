@@ -1,0 +1,13 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-consumer
+  namespace: so1p2
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: consumer-deploy
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 5

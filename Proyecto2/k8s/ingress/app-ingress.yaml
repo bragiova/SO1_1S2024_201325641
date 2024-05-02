@@ -21,10 +21,10 @@ spec:
             name: service-grpc
             port:
               number: 3000
-      # - path: /rust/
-      #   pathType: Prefix
-      #   backend:
-      #     service:
-      #       name: service-rust
-      #       port:
-      #         number: 8000
+      - path: /rust/
+        pathType: Prefix
+        backend:
+          service:
+            name: service-rust
+            port:
+              number: 8000

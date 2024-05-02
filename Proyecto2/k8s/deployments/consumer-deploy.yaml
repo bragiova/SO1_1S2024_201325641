@@ -15,8 +15,15 @@ spec:
     spec:
       containers:
         - name: consumer
-          image: bragiova/consumer:v1
+          image: bragiova/consumer:v2
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
           ports:
             - containerPort: 3002
           env:
@@ -45,3 +52,8 @@ spec:
                 secretKeyRef:
                   name: secret-consumer
                   key: REDIS_PASS
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: secret-consumer
+                  key: MONGO_URI      

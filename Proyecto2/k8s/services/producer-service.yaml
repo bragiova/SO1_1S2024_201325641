@@ -10,4 +10,4 @@ spec:
       targetPort: 3002
   selector:
     name: producer-deploy
-  type: LoadBalancer
+  type: ClusterIP

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-rust
+  namespace: so1p2
+spec:
+  selector:
+    matchLabels:
+      role: route-rust
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: route-rust
+
+    spec:
+      containers:
+      - name: rust-client
+        image: bragiova/rust-client:v1
+        ports:
+        - containerPort: 8000
+      - name: rust-server
+        image: bragiova/rust-server:v2
+        ports:
+        - containerPort: 8080
+        env:
+          - name: TOPIC
+            valueFrom:
+              secretKeyRef:
+                name: secret-consumer
+                key: TOPIC
+          - name: KAFKABROKER
+            valueFrom:
+              secretKeyRef:
+                name: secret-rust-server
+                key: KAFKABROKER

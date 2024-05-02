@@ -4,7 +4,7 @@ metadata:
   name: service-grpc
   namespace: so1p2
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: grpc-client-port
     port: 3000
