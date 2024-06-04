@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const dbConnection = async() => {
     try {
-        const stringConnect = process.env.DB_HOST + '/' + process.env.DB_NAME;
+        const stringConnect = process.env.DB_HOST + '/' + process.env.DB_NAME + '?authSource=admin';
         await mongoose.connect(stringConnect, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
